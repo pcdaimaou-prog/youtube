@@ -1,21 +1,22 @@
-name: "MC-AI-Architect-Pro-Final"
+name: "MC-AI-Architect-Ultimate"
 on: [workflow_dispatch]
 
 permissions:
   contents: write
 
 jobs:
-  # --- 管理サーバー (1ジョブ) ---
+  # 司令塔ジョブ
   server:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run Server
+      - name: Start Management Server
         run: |
-          npm install express localtunnel
+          npm install express localtunnel node-fetch@2 minimist
+          # 1時間(3600秒)でタイムアウト
           timeout 3600s node main.js --mode server
 
-  # --- AIボット (10ジョブ) ---
+  # AIボットジョブ (10並列)
   bot:
     runs-on: ubuntu-latest
     strategy:
@@ -28,11 +29,10 @@ jobs:
       - name: Setup Ollama
         run: |
           curl -fsSL https://ollama.com/install.sh | sh
-          ollama serve & 
-          sleep 10 && ollama pull llama3:8b-instruct-q4_0
+          ollama serve & sleep 10 && ollama pull llama3:8b-instruct-q4_0
       - name: Run AI Bot
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm install mineflayer node-fetch minimist
+          npm install mineflayer node-fetch@2 minimist
           node main.js --mode bot --pair ${{ matrix.pair_id }} --role ${{ matrix.role }} --name "Bot-${{ matrix.pair_id }}-${{ matrix.role }}"
