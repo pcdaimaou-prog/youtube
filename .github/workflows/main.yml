@@ -1,24 +1,25 @@
-name: "MC-AI-Architect-Final-Form"
+name: "MC-AI-Architect-Ultimate-Form"
 on:
   workflow_dispatch:
     inputs:
       mc_host:
-        description: 'マイクラサーバーのIP'
+        description: 'マイクラサーバーIP'
         default: 'youtube.logic-archive.f5.si'
-      task_p1:
-        description: 'ペア1への建築指示と範囲 (指示 | X1 Y1 Z1 | X2 Y2 Z2)'
-        default: '和風の城門 | 100 64 100 | 120 80 120'
-      task_p2:
-        description: 'ペア2への建築指示と範囲'
+      # ペアごとの設定 (指示 | 座標1 | 座標2)
+      p1_config:
+        description: 'Pair1: 指示 | X1 Y1 Z1 | X2 Y2 Z2'
+        default: 'モダンハウス | 100 64 100 | 120 80 120'
+      p2_config:
+        description: 'Pair2: 指示 | X1 Y1 Z1 | X2 Y2 Z2'
         default: '噴水広場 | 130 64 100 | 150 80 120'
-      task_p3:
-        description: 'ペア3への建築指示と範囲'
+      p3_config:
+        description: 'Pair3: 指示 | X1 Y1 Z1 | X2 Y2 Z2'
         default: '見張り塔 | 160 64 100 | 180 80 120'
-      task_p4:
-        description: 'ペア4への建築指示と範囲'
+      p4_config:
+        description: 'Pair4: 指示 | X1 Y1 Z1 | X2 Y2 Z2'
         default: 'TNT倉庫 | 190 64 100 | 210 80 120'
-      task_p5:
-        description: 'ペア5への建築指示と範囲'
+      p5_config:
+        description: 'Pair5: 指示 | X1 Y1 Z1 | X2 Y2 Z2'
         default: '黄金の像 | 220 64 100 | 240 80 120'
 
 permissions:
@@ -43,9 +44,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npm install mineflayer minimist node-fetch@2
-          # 選択されたペアの設定を環境変数から取得
-          CONFIG_KEY="task_p${{ matrix.pair_id }}"
-          FULL_CONFIG="${{ github.event.inputs[format('task_p{0}', matrix.pair_id)] }}"
+          # 選択されたペアの設定を取得
+          FULL_CONFIG="${{ github.event.inputs[format('p{0}_config', matrix.pair_id)] }}"
           
           node main.js \
             --host "${{ github.event.inputs.mc_host }}" \
