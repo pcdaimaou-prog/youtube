@@ -1,0 +1,50 @@
+name: "MC-AI-Full-System"
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  # --- 1. 管理サーバー (1ジョブ) ---
+  server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Run Server with LocalTunnel
+        run: |
+          npm install express localtunnel
+          # サーバーを1時間限定で起動
+          timeout 3600s node server.js
+
+  # --- 2. AIボット (10ジョブ) ---
+  bot:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        pair_id: [1, 2, 3, 4, 5]
+        role: ["A", "B"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Ollama
+        run: |
+          curl -fsSL https://ollama.com/install.sh | sh
+          ollama serve & 
+          sleep 10 && ollama pull llama3:8b-instruct-q4_0
+      - name: Run Bot
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # ここに server ジョブで発行されたトンネルURLを手動、あるいは
+          # 本来はIssue経由等で渡しますが、今回は固定サブドメインを指定して自動化しやすくします
+        run: |
+          npm install mineflayer node-fetch minimist
+          # 55分後に進捗保存
+          (sleep 3300 && node save_progress.js && killall node) &
+          # ボット起動
+          node bot.js --pair ${{ matrix.pair_id }} --name "Bot-${{ matrix.pair_id }}-${{ matrix.role }}"
