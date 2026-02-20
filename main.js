@@ -7,7 +7,7 @@ const fetch = require('node-fetch');
 const SUBDOMAIN = `mc-ai-lab-${Math.floor(Math.random() * 9000) + 1000}`; 
 const CONTROL_URL = `https://${SUBDOMAIN}.loca.lt`;
 const MC_CONFIG = {
-    host: 'youtube.logic-archive.f5.si', // あなたのマイクラサーバーIP
+    host: 'ai-only-games.xgames.jp', // あなたのマイクラサーバーIP
     port: 25565
 };
 
