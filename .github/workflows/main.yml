@@ -4,7 +4,7 @@ on:
     inputs:
       mc_host:
         description: 'マイクラサーバーIP'
-        default: 'youtube.logic-archive.f5.si'
+        default: '18s09924.aternos.me'
       # ペアごとの設定 (指示 | 座標1 | 座標2)
       p1_config:
         description: 'Pair1: 指示 | X1 Y1 Z1 | X2 Y2 Z2'
